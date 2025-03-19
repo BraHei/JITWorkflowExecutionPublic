@@ -1,0 +1,414 @@
+openapi: 3.0.0
+info:
+  title: Replication API
+  description: API for managing workflow events and Rclone operations.
+  contact:
+    email: ciyan.cocelli@student.uva.nl
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Replication Service API
+security:
+- apiKeyAuth: []
+tags:
+- name: workflow
+  description: Handles workflow events and ensures file availability
+- name: rclone
+  description: Rclone-based file and folder management
+paths:
+  /workflow/event:
+    post:
+      tags:
+      - workflow
+      summary: Handle a workflow event
+      description: Ensures files listed in the workflow event are available in the
+        primary endpoint.
+      operationId: workflow_event_handler_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowEvent'
+        required: true
+      responses:
+        "200":
+          description: Workflow event processed successfully
+      x-openapi-router-controller: swagger_server.controllers.workflow_controller
+  /rclone/configure:
+    post:
+      tags:
+        - rclone
+      summary: Configure Rclone remote
+      description: Adds or updates an Rclone remote.
+      operationId: rclone_configure_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RcloneConfigRequest'
+        required: true
+      responses:
+        "200":
+          description: Rclone configuration updated successfully
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+    get:
+      tags:
+        - rclone
+      summary: Get configured Rclone remotes
+      description: Retrieves the list of configured Rclone remotes.
+      operationId: rclone_configure_get
+      responses:
+        "200":
+          description: List of configured remotes
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/configure/{remote_name}:
+    delete:
+      tags:
+        - rclone
+      summary: Remove Rclone remote
+      description: Deletes an existing Rclone remote.
+      operationId: rclone_configure_delete
+      parameters:
+      - name: remote_name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Rclone remote deleted successfully
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/sync:
+    post:
+      tags:
+      - rclone
+      summary: Sync folders using Rclone
+      description: Synchronizes folders between source and destination endpoints.
+      operationId: rclone_sync_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RcloneSyncRequest'
+        required: true
+      responses:
+        "200":
+          description: Synchronization completed successfully
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/copy:
+    post:
+      tags:
+      - rclone
+      summary: Copy files using Rclone
+      description: Copies specified files between source and destination endpoints.
+      operationId: rclone_copy_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RcloneCopyRequest'
+        required: true
+      responses:
+        "200":
+          description: File copy operation completed successfully
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/get-endpoint-alias:
+    get:
+      tags:
+      - rclone
+      summary: Get endpoint alias
+      description: Returns the alias matching a given Rclone endpoint.
+      operationId: rclone_get_endpoint_alias_get
+      parameters:
+      - name: endpoint
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Endpoint alias retrieved
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/check:
+    get:
+      tags:
+      - rclone
+      summary: Check if a file or directory exists
+      description: Verifies whether a given file or folder exists in remote storage.
+      operationId: rclone_check_get
+      parameters:
+      - name: path
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: file
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: File existence check completed
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/folders:
+    post:
+      tags:
+        - rclone
+      summary: Create a folder in Rclone remote
+      description: Creates a new folder in the specified Rclone remote.
+      operationId: rclone_create_folder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RcloneFolderRequest"
+        required: true
+      responses:
+        "201":
+          description: Folder created successfully
+        "400":
+          description: Invalid request
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+    delete:
+      tags:
+        - rclone
+      summary: Delete a folder in Rclone remote
+      description: Deletes a folder and its contents in the specified Rclone remote.
+      operationId: rclone_delete_folder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RcloneFolderRequest"
+        required: true
+      responses:
+        "200":
+          description: Folder deleted successfully
+        "400":
+          description: Invalid folder path
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+    get:
+      tags:
+        - rclone
+      summary: Gets all folders in Rclone remote
+      description: Lists all folder in Rclone remote
+      operationId: rclone_list_folders
+      parameters:
+        - name: remote
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Folder deleted successfully
+        "400":
+          description: Invalid folder path
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+
+
+  /rclone/files:
+    get:
+      tags:
+        - rclone
+      summary: List files in an Rclone remote folder
+      description: Retrieves a list of files in the specified Rclone remote folder.
+      operationId: rclone_list_files
+      parameters:
+        - name: remote
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: folder
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of files retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RcloneFileItem"
+        "400":
+          description: Invalid folder path
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+    post:
+      tags:
+        - rclone
+      summary: Upload a file to Rclone remote
+      description: Uploads a file to the specified Rclone remote.
+      operationId: rclone_upload_file
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RcloneFileUploadRequest"
+        required: true
+      responses:
+        "201":
+          description: File uploaded successfully
+        "400":
+          description: Invalid request
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /rclone/files/{file_path}:
+    delete:
+      tags:
+        - rclone
+      summary: Delete a file in Rclone remote
+      description: Deletes a specific file from the specified Rclone remote.
+      operationId: rclone_delete_file
+      parameters:
+        - name: file_path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File deleted successfully
+        "400":
+          description: Invalid file path
+      x-openapi-router-controller: swagger_server.controllers.rclone_controller
+  /health:
+    get:
+      tags:
+        - health
+      summary: Health check endpoint
+      description: Returns the status of the replication service.
+      operationId: health_check
+      security: []  # No API key authentication
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+      x-openapi-router-controller: swagger_server.controllers.health_controller
+components:
+  schemas:
+    WorkflowEvent:
+      type: object
+      properties:
+        primary_endpoint:
+          type: string
+        secondary_endpoint:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+    RcloneSyncRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        destination:
+          type: string
+        parallel_files:
+          type: integer
+          default: 1
+        folders:
+          type: array
+          items:
+            type: string
+    RcloneCopyRequest:
+      type: object
+      properties:
+        source:
+          type: string
+        destination:
+          type: string
+        parallel_files:
+          type: integer
+          default: 1
+        files:
+          type: array
+          items:
+            type: string
+    RcloneConfigRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: primary-storage
+        type:
+          type: string
+          example: s3
+        access_key:
+          type: string
+          example: minioadmin
+        secret_key:
+          type: string
+          example: minioadmin
+        endpoint:
+          type: string
+          example: http://minio:9000
+        remote:
+          type: string
+          example: /local/folder/to/use
+        additional_options:
+          type: object
+          additionalProperties: true
+    RcloneFolderRequest:
+      type: object
+      properties:
+        remote:
+          type: string
+          example: "primary-storage"
+        folder:
+          type: string
+          example: "data-folder"
+    RcloneFileUploadRequest:
+      type: object
+      properties:
+        remote:
+          type: string
+          example: "primary-storage"
+        folder:
+          type: string
+          example: "uploads"
+        file:
+          type: string
+          format: binary
+    RcloneFileItem:
+      type: object
+      properties:
+        file_name:
+          type: string
+        size:
+          type: integer
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header
+      x-apikeyInfoFunc: swagger_server.controllers.authorization_controller.check_apiKeyAuth
+

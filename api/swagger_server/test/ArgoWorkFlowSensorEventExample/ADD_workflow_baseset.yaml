@@ -1,0 +1,262 @@
+{
+  "type": "ADD",
+  "body": {
+    "apiVersion": "argoproj.io/v1alpha1",
+    "kind": "Workflow",
+    "metadata": {
+      "annotations": {
+        "workflows.argoproj.io/pod-name-format": "v2"
+      },
+      "creationTimestamp": "2025-03-14T20:43:05Z",
+      "generateName": "download-multiple-files-",
+      "generation": 1,
+      "labels": {
+        "workflows.argoproj.io/creator": "system-serviceaccount-argo-developer",
+        "workflows.argoproj.io/resubmitted-from-workflow": "download-multiple-files-7w6xr"
+      },
+      "managedFields": [
+        {
+          "apiVersion": "argoproj.io/v1alpha1",
+          "fieldsType": "FieldsV1",
+          "fieldsV1": {
+            "f:metadata": {
+              "f:annotations": {
+                ".": {},
+                "f:workflows.argoproj.io/pod-name-format": {}
+              },
+              "f:generateName": {},
+              "f:labels": {
+                ".": {},
+                "f:workflows.argoproj.io/creator": {},
+                "f:workflows.argoproj.io/resubmitted-from-workflow": {}
+              }
+            },
+            "f:spec": {},
+            "f:status": {}
+          },
+          "manager": "argo",
+          "operation": "Update",
+          "time": "2025-03-14T20:43:05Z"
+        }
+      ],
+      "name": "download-multiple-files-sv6mf",
+      "namespace": "argo",
+      "resourceVersion": "15144",
+      "uid": "2775cba3-15a1-4d76-9628-f14e8e140202"
+    },
+    "spec": {
+      "arguments": {
+        "parameters": [
+          {
+            "name": "files",
+            "value": "[\n  \"/dataset_basetest/0210-csv.csv\",\n  \"/dataset_basetest/0298-csv.csv\",\n  \"/dataset_basetest/0402-csv.csv\"\n]\n"
+          },
+          {
+            "name": "primary_endpoint",
+            "value": "https://scruffy.lab.uvalight.net:9000"
+          },
+          {
+            "name": "secondary_endpoint",
+            "value": "https://data-naavre.lifewatch.dev:443"
+          },
+          {
+            "name": "primary_folder",
+            "value": "naa-vre-user-data/lifewatchminio@hayblock.nl"
+          },
+          {
+            "name": "secondary_folder",
+            "value": "projectgroup7"
+          },
+          {
+            "name": "primary_access_key",
+            "value": "XXX"
+          },
+          {
+            "name": "primary_secret_key",
+            "value": "XXX"
+          },
+          {
+            "name": "secondary_access_key",
+            "value": "XXX"
+          },
+          {
+            "name": "secondary_secret_key",
+            "value": "XXX"
+          }
+        ]
+      },
+      "entrypoint": "main",
+      "serviceAccountName": "default",
+      "templates": [
+        {
+          "inputs": {},
+          "metadata": {},
+          "name": "main",
+          "outputs": {},
+          "steps": [
+            [
+              {
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "files",
+                      "value": "{{workflow.parameters.files}}"
+                    },
+                    {
+                      "name": "primary_endpoint",
+                      "value": "{{workflow.parameters.primary_endpoint}}"
+                    },
+                    {
+                      "name": "secondary_endpoint",
+                      "value": "{{workflow.parameters.secondary_endpoint}}"
+                    },
+                    {
+                      "name": "primary_folder",
+                      "value": "{{workflow.parameters.primary_folder}}"
+                    },
+                    {
+                      "name": "secondary_folder",
+                      "value": "{{workflow.parameters.secondary_folder}}"
+                    },
+                    {
+                      "name": "primary_access_key",
+                      "value": "{{workflow.parameters.primary_access_key}}"
+                    },
+                    {
+                      "name": "primary_secret_key",
+                      "value": "{{workflow.parameters.primary_secret_key}}"
+                    },
+                    {
+                      "name": "secondary_access_key",
+                      "value": "{{workflow.parameters.secondary_access_key}}"
+                    },
+                    {
+                      "name": "secondary_secret_key",
+                      "value": "{{workflow.parameters.secondary_secret_key}}"
+                    }
+                  ]
+                },
+                "name": "process-files",
+                "template": "process-files-serially"
+              }
+            ]
+          ]
+        },
+        {
+          "inputs": {
+            "parameters": [
+              { "name": "files" },
+              { "name": "primary_endpoint" },
+              { "name": "secondary_endpoint" },
+              { "name": "primary_folder" },
+              { "name": "secondary_folder" },
+              { "name": "primary_access_key" },
+              { "name": "primary_secret_key" },
+              { "name": "secondary_access_key" },
+              { "name": "secondary_secret_key" }
+            ]
+          },
+          "metadata": {},
+          "name": "process-files-serially",
+          "outputs": {},
+          "parallelism": 1,
+          "steps": [
+            [
+              {
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "file",
+                      "value": "{{item}}"
+                    },
+                    {
+                      "name": "primary_endpoint",
+                      "value": "{{inputs.parameters.primary_endpoint}}"
+                    },
+                    {
+                      "name": "secondary_endpoint",
+                      "value": "{{inputs.parameters.secondary_endpoint}}"
+                    },
+                    {
+                      "name": "primary_folder",
+                      "value": "{{inputs.parameters.primary_folder}}"
+                    },
+                    {
+                      "name": "secondary_folder",
+                      "value": "{{inputs.parameters.secondary_folder}}"
+                    },
+                    {
+                      "name": "primary_access_key",
+                      "value": "{{inputs.parameters.primary_access_key}}"
+                    },
+                    {
+                      "name": "primary_secret_key",
+                      "value": "{{inputs.parameters.primary_secret_key}}"
+                    },
+                    {
+                      "name": "secondary_access_key",
+                      "value": "{{inputs.parameters.secondary_access_key}}"
+                    },
+                    {
+                      "name": "secondary_secret_key",
+                      "value": "{{inputs.parameters.secondary_secret_key}}"
+                    }
+                  ]
+                },
+                "name": "process-file",
+                "template": "download-and-process-file",
+                "withParam": "{{inputs.parameters.files}}"
+              }
+            ]
+          ]
+        },
+        {
+          "inputs": {
+            "parameters": [
+              { "name": "file" },
+              { "name": "primary_endpoint" },
+              { "name": "secondary_endpoint" },
+              { "name": "primary_folder" },
+              { "name": "secondary_folder" },
+              { "name": "primary_access_key" },
+              { "name": "primary_secret_key" },
+              { "name": "secondary_access_key" },
+              { "name": "secondary_secret_key" }
+            ]
+          },
+          "metadata": {},
+          "name": "download-and-process-file",
+          "outputs": {},
+          "script": {
+            "command": ["sh"],
+            "image": "amazon/aws-cli:latest",
+            "name": "",
+            "resources": {},
+            "source": "set -e\n\nFILE=\"{{inputs.parameters.file}}\"\nPRIMARY_ENDPOINT=\"{{inputs.parameters.primary_endpoint}}\"\nSECONDARY_ENDPOINT=\"{{inputs.parameters.secondary_endpoint}}\"\nPRIMARY_FOLDER=\"{{inputs.parameters.primary_folder}}\"\nSECONDARY_FOLDER=\"{{inputs.parameters.secondary_folder}}\"\n\necho \"Processing $FILE\"\necho \"Trying primary endpoint: $PRIMARY_ENDPOINT\"\n\naws configure set aws_access_key_id \"{{inputs.parameters.primary_access_key}}\" --profile primary\naws configure set aws_secret_access_key \"{{inputs.parameters.primary_secret_key}}\" --profile primary\naws configure set region nl-uvalight --profile primary\n\necho \"PRIMARY\"\necho aws s3 cp s3://$PRIMARY_FOLDER/$FILE /data/$FILE --endpoint-url $PRIMARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile primary --debug\nif aws s3 cp s3://$PRIMARY_FOLDER$FILE /data/$FILE --endpoint-url $PRIMARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile primary --debug; then\n  echo \"Downloaded $FILE from primary\"\nelse\n  echo \"Primary failed. Trying secondary endpoint: $SECONDARY_ENDPOINT\"\n\naws configure set aws_access_key_id \"{{inputs.parameters.secondary_access_key}}\" --profile secondary\naws configure set aws_secret_access_key \"{{inputs.parameters.secondary_secret_key}}\" --profile secondary\n\necho \"SECONDARY\"\necho \"{{inputs.parameters.secondary_access_key}}\"\necho \"{{inputs.parameters.secondary_secret_key}}\"\necho aws s3 cp s3://$SECONDARY_FOLDER$FILE /data/$FILE --endpoint-url $SECONDARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile secondary --debug\nif aws s3 cp s3://$SECONDARY_FOLDER$FILE /data/$FILE --endpoint-url $SECONDARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile secondary --debug; then\n    echo \"Downloaded $FILE from secondary\"\nelse\n    echo \"Failed to download $FILE from both endpoints\"\n    exit 1\n  fi\nfi\n\necho \"Processing $FILE...\"\ncat /data/$FILE\nsleep 1\necho \"Finished processing $FILE\"\nexit 0\n",
+            "volumeMounts": [
+              {
+                "mountPath": "/data",
+                "name": "data-volume"
+              }
+            ]
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "emptyDir": {},
+          "name": "data-volume"
+        }
+      ]
+    },
+    "status": {
+      "finishedAt": null,
+      "startedAt": null
+    }
+  },
+  "oldBody": null,
+  "group": "argoproj.io",
+  "version": "v1alpha1",
+  "resource": "workflows"
+}
+

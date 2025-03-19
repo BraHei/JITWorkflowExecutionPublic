@@ -1,0 +1,30 @@
+flowchart TD
+    classDef ec2 fill:#81c784,stroke:#2e7d32,stroke-width:2px,color:#ffffff
+    classDef nat fill:#ff7043,stroke:#e64a19,stroke-width:2px,color:#ffffff
+    classDef igw fill:#5c6bc0,stroke:#1565c0,stroke-width:2px,color:#ffffff
+    
+    subgraph Private["Private Subnet"]
+        EC2["EC2 Instance"]:::ec2
+        RT["Route Table:
+        • 0.0.0.0/0 → NAT GW"]:::private
+    end
+    
+    subgraph Public["Public Subnet"]
+        NAT["NAT Gateway
+        (with EIP)"]:::nat
+        IGW["Internet Gateway"]:::igw
+        PRT["Route Table:
+        • 0.0.0.0/0 → IGW"]:::public
+    end
+    
+    subgraph Legend["Legend"]
+        L1[EC2 Instance]:::ec2
+        L2[NAT Gateway]:::nat
+        L3[Internet Gateway]:::igw
+    end
+    
+    %% Traffic Flow
+    EC2 -->|"Outbound Request"| RT
+    RT -->|"Routed Through"| NAT
+    NAT -->|"Translated & Forwarded"| IGW
+    IGW -->|"Internet Access"| External["External Service"]

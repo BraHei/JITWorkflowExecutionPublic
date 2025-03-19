@@ -1,0 +1,48 @@
+flowchart TD
+    classDef vpc fill:#1976d2,stroke:#01579b,stroke-width:2px,color:#ffffff
+    classDef public fill:#388e3c,stroke:#1b5e20,stroke-width:2px,color:#ffffff
+    classDef private fill:#7b1fa2,stroke:#4a148c,stroke-width:2px,color:#ffffff
+    classDef gateway fill:#e64a19,stroke:#bf360c,stroke-width:2px,color:#ffffff
+    
+    subgraph VPC["AWS VPC"]
+        direction TB
+        
+        subgraph Public["Public Zone"]
+            IGW["Internet Gateway"]:::gateway
+            ALBSN["public-ALB-access Subnet"]:::public
+            NATGW["NAT Gateway"]:::gateway
+        end
+        
+        subgraph Private["Private Zones"]
+            subgraph MinioZone["MinIO/Argo Lab Zone"]
+                MINIOSN["private-minio-access_testing Subnet"]:::private
+            end
+            
+            subgraph DBZone["Database Zone"]
+                DBSN["private-database-access Subnet"]:::private
+            end
+            
+            subgraph MSZone["Microservices Zone"]
+                MSSN["private-microservices-access Subnet"]:::private
+            end
+
+        end
+            %% Legend
+    subgraph Legend["Legend"]
+        L1[VPC]:::vpc
+        L2[Public Component]:::public
+        L3[Private Component]:::private
+        L4[Gateway]:::gateway
+    end
+    end
+    
+    %% Connections
+    IGW <---> ALBSN
+    IGW <---> NATGW
+    NATGW <---> MINIOSN
+    NATGW <---> MSSN
+    MSSN <---> DBSN
+    ALBSN <---> MINIOSN
+    ALBSN <---> MSSN
+    MINIOSN <---> MSSN
+    

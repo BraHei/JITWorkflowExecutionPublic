@@ -1,0 +1,47 @@
+sequenceDiagram
+    participant AW as Argo Workflow
+    participant RS as Replication Service
+    participant DB as Local Database
+    participant LM as Local MinIO
+    participant EM as External MinIO
+    
+    Note over AW,EM: Initial Phase
+    
+    AW->>RS: 1. Send REST replication event
+    activate RS
+    RS->>DB: 2. Query metadata cache
+    activate DB
+    DB-->>RS: 3. Return cache status
+    deactivate DB
+    
+    alt Data not in cache
+        RS->>EM: 4. Download object
+        activate EM
+        EM-->>RS: 5. Send object data
+        deactivate EM
+        
+        RS->>LM: 6. Upload to local MinIO
+        activate LM
+        LM-->>RS: 7. Confirm upload
+        deactivate LM
+        
+        RS->>DB: 8. Update metadata cache
+        activate DB
+        DB-->>RS: 9. Confirm cache update
+        deactivate DB
+        
+        Note over RS,DB: Cache Management
+        alt MinIO storage full
+            RS->>DB: 10. Query LRU cache
+            activate DB
+            DB-->>RS: 11. Return candidates
+            deactivate DB
+            
+            RS->>LM: 12. Remove old data
+            activate LM
+            LM-->>RS: 13. Confirm removal
+            deactivate LM
+        end
+    end
+    
+    deactivate RS

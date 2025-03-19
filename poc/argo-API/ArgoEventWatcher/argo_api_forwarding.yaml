@@ -1,0 +1,55 @@
+# API Forwarding Solution
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: default
+  namespace: argo
+spec:
+  nats:
+    native:
+      replicas: 1
+      
+---
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: replicationservicegroup7-api-eventsource
+  namespace: argo
+spec:
+  eventBusName: default
+  resource:
+    workflow-watch:
+      namespace: argo
+      group: argoproj.io
+      version: v1alpha1
+      resource: workflows
+      eventTypes:
+        - ADD
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: replicationservicegroup7-api-forwarding-sensor
+  namespace: argo
+spec:
+  eventBusName: default
+  dependencies:
+    - name: workflow-created
+      eventSourceName: replicationservicegroup7-api-eventsource
+      eventName: workflow-watch
+  triggers:
+    - template:
+        name: forward-workflow-submission
+        http:
+          url: "http://ecs-application-load-balancer-248883470.eu-central-1.elb.amazonaws.com/workflow/event"
+          method: "POST"
+          headers:
+            accept: "*/*"
+            X-API-KEY: "tst"
+            Content-Type: "application/json"
+          payload:
+            - src:
+                dependencyName: "workflow-created"
+              dest: "workflow_submission"

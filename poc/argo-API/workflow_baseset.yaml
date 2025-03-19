@@ -1,0 +1,165 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: download-multiple-files-
+  namespace: argo
+spec:
+  serviceAccountName: default
+  entrypoint: main
+  arguments:
+    parameters:
+      - name: files
+        value: |
+          [
+            "/dataset_basetest/0210-csv.csv",
+            "/dataset_basetest/0298-csv.csv",
+            "/dataset_basetest/0402-csv.csv"
+          ]
+      - name: primary_endpoint
+        value: https://scruffy.lab.uvalight.net:9000
+      - name: secondary_endpoint
+        value: https://data-naavre.lifewatch.dev:443
+      - name: primary_folder
+        value: naa-vre-user-data/lifewatchminio@hayblock.nl
+      - name: secondary_folder
+        value: projectgroup7
+      - name: primary_access_key
+        value: XXX
+      - name: primary_secret_key
+        value: XXX
+      - name: secondary_access_key
+        value: XXX
+      - name: secondary_secret_key
+        value: XXX
+        
+  volumes:
+    - name: data-volume
+      emptyDir: {}
+
+  templates:
+    - name: main
+      steps:
+        - - name: process-files
+            template: process-files-serially
+            arguments:
+              parameters:
+                - name: files
+                  value: "{{workflow.parameters.files}}"
+                - name: primary_endpoint
+                  value: "{{workflow.parameters.primary_endpoint}}"
+                - name: secondary_endpoint
+                  value: "{{workflow.parameters.secondary_endpoint}}"
+                - name: primary_folder
+                  value: "{{workflow.parameters.primary_folder}}"
+                - name: secondary_folder
+                  value: "{{workflow.parameters.secondary_folder}}"
+                - name: primary_access_key
+                  value: "{{workflow.parameters.primary_access_key}}"
+                - name: primary_secret_key
+                  value: "{{workflow.parameters.primary_secret_key}}"
+                - name: secondary_access_key
+                  value: "{{workflow.parameters.secondary_access_key}}"
+                - name: secondary_secret_key
+                  value: "{{workflow.parameters.secondary_secret_key}}"
+
+    - name: process-files-serially
+      inputs:
+        parameters:
+          - name: files
+          - name: primary_endpoint
+          - name: secondary_endpoint
+          - name: primary_folder
+          - name: secondary_folder
+          - name: primary_access_key
+          - name: primary_secret_key
+          - name: secondary_access_key
+          - name: secondary_secret_key
+      parallelism: 1
+      steps:
+        - - name: process-file
+            template: download-and-process-file
+            arguments:
+              parameters:
+                - name: file
+                  value: "{{item}}"
+                - name: primary_endpoint
+                  value: "{{inputs.parameters.primary_endpoint}}"
+                - name: secondary_endpoint
+                  value: "{{inputs.parameters.secondary_endpoint}}"
+                - name: primary_folder
+                  value: "{{inputs.parameters.primary_folder}}"
+                - name: secondary_folder
+                  value: "{{inputs.parameters.secondary_folder}}"
+                - name: primary_access_key
+                  value: "{{inputs.parameters.primary_access_key}}"
+                - name: primary_secret_key
+                  value: "{{inputs.parameters.primary_secret_key}}"
+                - name: secondary_access_key
+                  value: "{{inputs.parameters.secondary_access_key}}"
+                - name: secondary_secret_key
+                  value: "{{inputs.parameters.secondary_secret_key}}"
+            withParam: "{{inputs.parameters.files}}"
+
+    - name: download-and-process-file
+      inputs:
+        parameters:
+          - name: file
+          - name: primary_endpoint
+          - name: secondary_endpoint
+          - name: primary_folder
+          - name: secondary_folder
+          - name: primary_access_key
+          - name: primary_secret_key
+          - name: secondary_access_key
+          - name: secondary_secret_key
+      script:
+        image: amazon/aws-cli:latest
+        command: [sh]
+        source: |
+          set -e
+
+          FILE="{{inputs.parameters.file}}"
+          PRIMARY_ENDPOINT="{{inputs.parameters.primary_endpoint}}"
+          SECONDARY_ENDPOINT="{{inputs.parameters.secondary_endpoint}}"
+          PRIMARY_FOLDER="{{inputs.parameters.primary_folder}}"
+          SECONDARY_FOLDER="{{inputs.parameters.secondary_folder}}"
+
+          echo "Processing $FILE"
+          echo "Trying primary endpoint: $PRIMARY_ENDPOINT"
+
+          aws configure set aws_access_key_id "{{inputs.parameters.primary_access_key}}" --profile primary
+          aws configure set aws_secret_access_key "{{inputs.parameters.primary_secret_key}}" --profile primary
+          aws configure set region nl-uvalight --profile primary
+
+          echo "PRIMARY"
+          echo aws s3 cp s3://$PRIMARY_FOLDER/$FILE /data/$FILE --endpoint-url $PRIMARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile primary --debug
+          if aws s3 cp s3://$PRIMARY_FOLDER$FILE /data/$FILE --endpoint-url $PRIMARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile primary --debug; then
+            echo "Downloaded $FILE from primary"
+          else
+            echo "Primary failed. Trying secondary endpoint: $SECONDARY_ENDPOINT"
+
+          aws configure set aws_access_key_id "{{inputs.parameters.secondary_access_key}}" --profile secondary
+          aws configure set aws_secret_access_key "{{inputs.parameters.secondary_secret_key}}" --profile secondary
+
+          echo "SECONDARY"
+          echo "{{inputs.parameters.secondary_access_key}}"
+          echo "{{inputs.parameters.secondary_secret_key}}"
+          echo aws s3 cp s3://$SECONDARY_FOLDER$FILE /data/$FILE --endpoint-url $SECONDARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile secondary --debug
+          if aws s3 cp s3://$SECONDARY_FOLDER$FILE /data/$FILE --endpoint-url $SECONDARY_ENDPOINT --no-verify-ssl --cli-read-timeout 0 --cli-connect-timeout 0 --profile secondary --debug; then
+              echo "Downloaded $FILE from secondary"
+          else
+              echo "Failed to download $FILE from both endpoints"
+              exit 1
+            fi
+          fi
+
+          echo "Processing $FILE..."
+          cat /data/$FILE
+          sleep 1
+          echo "Finished processing $FILE"
+          exit 0
+
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+

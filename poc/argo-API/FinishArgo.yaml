@@ -1,0 +1,21 @@
+---
+- name: Uninstall Argo Workflows
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: Stop Argo UI port forwarding
+      shell: "pkill -f 'kubectl port-forward -n argo svc/argo-server'"
+      ignore_errors: yes
+
+    - name: Delete Argo Workflows from the cluster
+      command: kubectl delete -f https://github.com/argoproj/argo-workflows/releases/latest/download/install.yaml
+      ignore_errors: yes
+
+    - name: Remove Argo namespace
+      command: kubectl delete namespace argo
+      ignore_errors: yes
+
+    - name: Display uninstallation success message
+      debug:
+        msg: "Argo Workflows has been successfully removed!"

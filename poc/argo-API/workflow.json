@@ -1,0 +1,187 @@
+{
+  "namespace": "argo",
+  "serverDryRun": false,
+  "workflow": {
+    "metadata": {
+      "generateName": "download-multiple-files-",
+      "namespace": "argo",
+      "labels": {
+        "workflows.argoproj.io/completed": "false"
+      }
+    },
+    "spec": {
+      "entrypoint": "main",
+      "arguments": {
+        "parameters": [
+          {
+            "name": "files",
+            "value": "[\"file1.txt\", \"file2.txt\", \"file3.txt\"]"
+          }
+        ]
+      },
+      "templates": [
+        {
+          "name": "main",
+          "steps": [
+            [
+              {
+                "name": "process-each-file",
+                "template": "process-file-sequence",
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "files",
+                      "value": "{{workflow.parameters.files}}"
+                    }
+                  ]
+                }
+              }
+            ]
+          ]
+        },
+        {
+          "name": "process-file-sequence",
+          "inputs": {
+            "parameters": [
+              {
+                "name": "files"
+              }
+            ]
+          },
+          "script": {
+            "image": "python:3.8",
+            "command": ["python"],
+            "source": "import json\nfiles = json.loads('{{inputs.parameters.files}}')\nfor file in files:\n    print(file)"
+          }
+        },
+        {
+          "name": "download-file-with-fallback",
+          "inputs": {
+            "parameters": [
+              {
+                "name": "file"
+              }
+            ]
+          },
+          "steps": [
+            [
+              {
+                "name": "try-primary-endpoint",
+                "template": "download-file",
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "file",
+                      "value": "{{inputs.parameters.file}}"
+                    },
+                    {
+                      "name": "endpoint",
+                      "value": "alias_folder1"
+                    }
+                  ]
+                }
+              }
+            ],
+            [
+              {
+                "name": "fallback-to-secondary",
+                "template": "download-file",
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "file",
+                      "value": "{{inputs.parameters.file}}"
+                    },
+                    {
+                      "name": "endpoint",
+                      "value": "alias_folder2"
+                    }
+                  ]
+                },
+                "when": "{{steps.try-primary-endpoint.outputs.parameters.status}} == 'failure'"
+              }
+            ],
+            [
+              {
+                "name": "process-file",
+                "template": "process-file",
+                "arguments": {
+                  "parameters": [
+                    {
+                      "name": "file",
+                      "value": "{{inputs.parameters.file}}"
+                    }
+                  ]
+                }
+              }
+            ]
+          ]
+        },
+        {
+          "name": "download-file",
+          "inputs": {
+            "parameters": [
+              {
+                "name": "file"
+              },
+              {
+                "name": "endpoint"
+              }
+            ]
+          },
+          "script": {
+            "image": "amazon/aws-cli:latest",
+            "command": ["sh"],
+            "source": "set -e\necho \"Trying to download {{inputs.parameters.file}} from {{inputs.parameters.endpoint}}...\"\nif aws s3 cp s3://my-bucket/{{inputs.parameters.file}} /data/{{inputs.parameters.file}} --endpoint-url {{inputs.parameters.endpoint}}; then\necho \"success\" > /tmp/status\nelse\necho \"failure\" > /tmp/status\nfi"
+          },
+          "outputs": {
+            "parameters": [
+              {
+                "name": "status",
+                "valueFrom": {
+                  "path": "/tmp/status"
+                }
+              }
+            ]
+          },
+          "volumeMounts": [
+            {
+              "name": "data-volume",
+              "mountPath": "/data"
+            }
+          ],
+          "volumes": [
+            {
+              "name": "data-volume",
+              "emptyDir": {}
+            }
+          ]
+        },
+        {
+          "name": "process-file",
+          "inputs": {
+            "parameters": [
+              {
+                "name": "file"
+              }
+            ]
+          },
+          "container": {
+            "image": "alpine:latest",
+            "command": ["sh", "-c"],
+            "args": [
+              "echo \"Processing {{inputs.parameters.file}}...\"\ncat /data/{{inputs.parameters.file}}\nsleep 5\necho \"Processed {{inputs.parameters.file}}!\""
+            ]
+          },
+          "volumeMounts": [
+            {
+              "name": "data-volume",
+              "mountPath": "/data"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+

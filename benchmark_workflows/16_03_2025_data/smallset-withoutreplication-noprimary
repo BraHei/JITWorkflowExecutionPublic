@@ -1,0 +1,56 @@
+NAME
+smallfiles-withoutreplication-noprimary-6rv9n   
+START TIME
+3/16/2025, 2:44:14 PM (8m ago)
+END TIME
+3/16/2025, 2:51:37 PM (37s ago)
+DURATION
+7m23s
+
+NAME
+smallfiles-withoutreplication-noprimary-bcwgf   
+START TIME
+3/16/2025, 2:44:40 PM (7m48s ago)
+END TIME
+3/16/2025, 2:52:21 PM (7s ago)
+DURATION
+7m41s
+
+NAME
+smallfiles-withoutreplication-noprimary-sphs7   
+START TIME
+3/16/2025, 2:45:03 PM (7m34s ago)
+END TIME
+3/16/2025, 2:52:33 PM (4s ago)
+DURATION
+7m30s
+
+NAME
+smallfiles-withoutreplication-noprimary-gzg2j   
+ID
+smallfiles-withoutreplication-noprimary-gzg2j   
+TYPE
+Steps
+PHASE
+Succeeded
+START TIME
+3/16/2025, 2:51:43 PM (8m30s ago)
+END TIME
+3/16/2025, 2:59:14 PM (59s ago)
+DURATION
+7m31s
+
+NAME
+smallfiles-withoutreplication-noprimary-mktzh   
+ID
+smallfiles-withoutreplication-noprimary-mktzh   
+TYPE
+Steps
+PHASE
+Succeeded
+START TIME
+3/16/2025, 2:52:54 PM (7m31s ago)
+END TIME
+3/16/2025, 3:00:22 PM (2s ago)
+DURATION
+7m28s

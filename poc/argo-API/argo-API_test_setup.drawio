@@ -1,0 +1,93 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.9">
+  <diagram name="Page-1" id="pUQercsyngJlfAYZqeAs">
+    <mxGraphModel dx="2901" dy="1204" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="W8CXW17t_n5EPimQnzCE-1" value="MiniKube" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="50" y="110" width="440" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-2" value="Argo Workflow" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="65" y="150" width="410" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-3" value="Replicate Endpoint Stub" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="330" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-4" target="W8CXW17t_n5EPimQnzCE-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-4" value=":13337" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="350" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-5" value="POST:&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Parse YAML/JSON&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="360" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-7" value="WebHook Watcher" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="65" y="405" width="185" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-11" value="POST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-9" target="W8CXW17t_n5EPimQnzCE-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-9" value="WebHook Sensor" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="405" width="185" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-12" value=":12000" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="65" y="412.5" width="45" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-10" value="Event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-7" target="W8CXW17t_n5EPimQnzCE-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-15" target="W8CXW17t_n5EPimQnzCE-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-15" value="Workflow Job Watcher" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="65" y="270" width="185" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-29" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;API/CLI Request&lt;/span&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-16" target="W8CXW17t_n5EPimQnzCE-2">
+          <mxGeometry x="-0.1304" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint y="190" />
+              <mxPoint y="190" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-16" value="User Request" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-170" y="165" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-19" value="POST JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-18" target="W8CXW17t_n5EPimQnzCE-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-18" value="Custom Replicate Request" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="-170" y="420" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-23" value="POST" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-20" target="W8CXW17t_n5EPimQnzCE-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-20" value="Workflow Job Sensor" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="290" y="270" width="185" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-22" value="Event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="W8CXW17t_n5EPimQnzCE-15" target="W8CXW17t_n5EPimQnzCE-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-30" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;- Workflow ADD&lt;/span&gt;&lt;div style=&quot;forced-color-adjust: none; color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;&quot;&gt;- Workflow UPDATE&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="97.5" y="285" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-31" value="Send Workflow Request Form" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="323" y="285" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-33" value="- event POST" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="137.5" y="427.5" width="80" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-34" value="Send Request Form" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="322.5" y="415" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="W8CXW17t_n5EPimQnzCE-35" value="Test setup" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=25;" vertex="1" parent="1">
+          <mxGeometry x="159" y="60" width="222" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

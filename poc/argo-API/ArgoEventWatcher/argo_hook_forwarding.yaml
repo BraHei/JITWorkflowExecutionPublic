@@ -1,0 +1,52 @@
+# Webhook EventSource
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: webhook-forwarding
+  namespace: argo
+spec:
+  eventBusName: default
+  webhook:
+    workflow-event:
+      port: "12000"
+      endpoint: "/"
+      method: "POST"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-forwarding-svc
+  namespace: argo
+spec:
+  selector:
+    eventsource-name: webhook-forwarding
+  ports:
+    - protocol: TCP
+      port: 12000
+      targetPort: 12000
+      name: webhook
+  type: NodePort
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: webhook-forwarder
+  namespace: argo
+spec:
+  eventBusName: default
+  dependencies:
+    - name: workflow-event-trigger
+      eventSourceName: webhook-forwarding
+      eventName: workflow-event
+  triggers:
+    - template:
+        name: forward-webhook-event
+        http:
+          url: "http://192.168.88.128:13337/"
+          method: "POST"
+          payload:
+            - src:
+                dependencyName: "workflow-event-trigger"
+              dest: "full_event"

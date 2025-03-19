@@ -1,0 +1,172 @@
+- name: Install Argo Workflows and Argo Events
+  hosts: localhost
+  gather_facts: no
+  vars:
+    argo_namespace: argo
+    argo_events_namespace: argo-events
+    argo_version: v3.6.4
+    argo_events_version: v1.8.1
+    argo_release_url: "https://github.com/argoproj/argo-workflows/releases/download/{{ argo_version }}/install.yaml"
+    argo_events_release_url: "https://github.com/argoproj/argo-events/releases/download/{{ argo_events_version }}/install.yaml"
+
+  tasks:
+
+    - name: Ensure Argo namespace exists
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ argo_namespace }}"
+        state: present
+
+    - name: Ensure Argo Events namespace exists
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ argo_events_namespace }}"
+        state: present
+
+    - name: Install Argo Workflows
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        src: "{{ argo_release_url }}"
+
+    - name: Install Argo Events
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_events_namespace }}"
+        src: "{{ argo_events_release_url }}"
+
+    - name: Deploy Argo Events EventBus in argo-events namespace
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_events_namespace }}"
+        definition:
+          apiVersion: argoproj.io/v1alpha1
+          kind: EventBus
+          metadata:
+            name: default
+          spec:
+            nats:
+              native: {}
+
+    - name: Patch workflow-controller args to speed up requeue interval
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: workflow-controller
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: workflow-controller
+                    args:
+                      - --configmap=workflow-controller-configmap
+                      - --executor-image=argoproj/argoexec:{{ argo_version }}
+                      - --loglevel=info
+                      - --workflow-requeue-interval=1s
+
+    - name: Ensure Argo Workflow Role exists for default ServiceAccount
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: argo-workflow-role
+          rules:
+            - apiGroups: ["argoproj.io"]
+              resources: ["workflows", "workflowtemplates", "workflowtasksets", "cronworkflows", "workflowtaskresults"]
+              verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+    - name: Bind argo-workflow-role to default ServiceAccount
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: RoleBinding
+          metadata:
+            name: argo-workflow-rolebinding
+          subjects:
+            - kind: ServiceAccount
+              name: default
+              namespace: "{{ argo_namespace }}"
+          roleRef:
+            kind: Role
+            name: argo-workflow-role
+            apiGroup: rbac.authorization.k8s.io
+
+    - name: Ensure developer ServiceAccount exists
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: developer
+
+    - name: Create developer full-access Role in argo namespace
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: developer-role
+          rules:
+            - apiGroups: ["*"]
+              resources: ["*"]
+              verbs: ["*"]
+
+    - name: Bind developer-role to developer ServiceAccount
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: RoleBinding
+          metadata:
+            name: developer-rolebinding
+          subjects:
+            - kind: ServiceAccount
+              name: developer
+              namespace: "{{ argo_namespace }}"
+          roleRef:
+            kind: Role
+            name: developer-role
+            apiGroup: rbac.authorization.k8s.io
+
+    - name: Create developer ServiceAccount token secret
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ argo_namespace }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: developer-token
+            annotations:
+              kubernetes.io/service-account.name: developer
+          type: kubernetes.io/service-account-token
+
+    - name: Start Argo UI port forward (async background task)
+      ansible.builtin.shell: "nohup kubectl port-forward -n {{ argo_namespace }} svc/argo-server 2746:2746 > /tmp/argo_port_forward.log 2>&1 &"
+      async: 0
+      poll: 0
+
+    - name: Wait until Argo UI is accessible
+      wait_for:
+        port: 2746
+        timeout: 60
+
+    - name: Display Argo UI URL
+      debug:
+        msg: "Argo UI is accessible at https://localhost:2746"

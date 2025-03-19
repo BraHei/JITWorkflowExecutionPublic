@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant PS as Private Subnet
+    participant RT as Route Table
+    participant NG as NAT Gateway
+    participant IG as Internet Gateway
+    participant I as Internet
+    
+    Note over PS,I: Outbound Traffic Flow
+    
+    PS->>RT: 1. Request to access internet
+    RT->>PS: 2. Route to NAT Gateway
+    PS->>NG: 3. Send traffic to NAT
+    NG->>NG: 4. Translate private IP to EIP
+    NG->>IG: 5. Forward to Internet Gateway
+    IG->>I: 6. Send to internet
+    I->>IG: 7. Internet response
+    IG->>NG: 8. Return through IGW
+    NG->>NG: 9. Translate EIP back to private IP
+    NG->>PS: 10. Return to private subnet
+    
+    Note over PS,I: Connection Tracking
+    NG->>NG: Maintains connection state
+    Note over NG: Allows return traffic<br/>without new route lookup
